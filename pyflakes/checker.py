@@ -1585,6 +1585,8 @@ class Checker:
                 for k, v in iter_dict_children(node.args[1]):
                     _non_annotation(k)
                     _annotation(v)
+            else:
+                _non_annotations(node.args[1:2])
             _non_annotations(node.args[2:])
 
             # TypedDict("a", a=int)

@@ -790,6 +790,40 @@ class TestTypeAnnotations(TestCase):
             TypedDict("U", x="T")
             ''')
 
+    def test_typeddict_get_type_hints(self):
+        self.flakes("""
+        from typing import TypedDict, get_type_hints
+
+        class Example:
+            value: int
+
+        ExampleDict = TypedDict("ExampleDict", get_type_hints(Example))
+        """)
+
+    def test_typeddict_fields_variable(self):
+        self.flakes("""
+        from typing import TypedDict
+
+        def make_typed_dict():
+            fields = {"value": int}
+            return TypedDict("ExampleDict", fields)
+        """)
+
+    def test_typeddict_fields_undefined_name(self):
+        self.flakes("""
+        from typing import TypedDict
+
+        ExampleDict = TypedDict("ExampleDict", missing_function())
+        """, m.UndefinedName)
+
+    def test_typeddict_fields_not_annotation(self):
+        self.flakes("""
+        from typing import TypedDict
+        from example import fields
+
+        ExampleDict = TypedDict("ExampleDict", fields["not a type"])
+        """)
+
     def test_typeddict_key_value_ordering(self):
         self.flakes("""
         from typing import TypedDict
